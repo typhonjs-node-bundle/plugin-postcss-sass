@@ -4,10 +4,7 @@
   "version": "0.0.0",
   "author": "typhonrt",
   "bugs": "https://github.com/typhonjs-node-bundle/plugin-postcss-sass/issues",
-  "dependencies": {
-    "@oclif/command": "^1.8.0",
-    "@oclif/config": "^1.17.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
     "@oclif/plugin-help": "^3.2.1",
@@ -38,11 +35,7 @@
       "init": [
         "./src/hooks/init/init"
       ]
-    },
-    "bin": "oclif-example",
-    "devPlugins": [
-      "@oclif/plugin-help"
-    ]
+    }
   },
   "repository": "typhonjs-node-bundle/plugin-postcss-sass",
   "scripts": {

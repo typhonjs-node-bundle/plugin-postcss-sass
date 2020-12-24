@@ -36,7 +36,7 @@ module.exports = async function(opts)
 {
    try
    {
-      process.pluginManager.add({ name: 'plugin-postcss-sass', instance: PluginHandler });
+      global.$$pluginManager.add({ name: 'plugin-postcss-sass', instance: PluginHandler });
 
       // TODO REMOVE
       process.stdout.write(`plugin-postcss-sass init hook running ${opts.id}\n`);

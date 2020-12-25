@@ -1,3 +1,8 @@
+const postcss           = require('rollup-plugin-postcss');
+
+const autoprefixer      = require('autoprefixer');
+const postcssPresetEnv  = require('postcss-preset-env');
+
 /**
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
  * instance of `rollup-plugin-postcss` with autoprefixer, postcss, postcss-preset-env.
@@ -5,9 +10,31 @@
 class PluginHandler
 {
    /**
-    * @returns {string}
+    * Returns the configured input plugin for `@rollup/plugin-replace`
+    *
+    * @param {object} config        - The CLI config
+    * @param {object} config.flags  - The CLI config
+    *
+    * @returns {object} Rollup plugin
     */
-   static test() { return 'some testing'; }
+   static getInputPlugin(config = {})
+   {
+      if (config.flags)
+      {
+         const sourceMap = typeof config.flags.sourcemap === 'boolean' ? config.flags.sourcemap : true;
+
+         const postcssConfig = {
+            inject: false,                               // Don't inject CSS into <HEAD>
+            extract: `styles.css`,                       // Output to `styles.css` in directory of the bundle
+            extensions: ['.scss', '.sass', '.css'],      // File extensions
+            plugins: [autoprefixer, postcssPresetEnv],   // Postcss plugins to use
+            sourceMap,                                   // Potentially generate sourcemaps
+            use: ['sass'],                               // Use sass / dart-sass
+         };
+
+         return postcss(postcssConfig);
+      }
+   }
 
    /**
     * Wires up PluginHandler on the plugin eventbus.
@@ -20,8 +47,7 @@ class PluginHandler
     */
    static onPluginLoad(ev)
    {
-      // TODO: ADD EVENT REGISTRATION
-      // eventbus.on(`${eventPrepend}test`, PluginHandler.test, PluginHandler);
+      ev.eventbus.on('typhonjs:oclif:rollup:plugins:input:get', PluginHandler.getInputPlugin, PluginHandler);
    }
 }
 
@@ -36,7 +62,7 @@ module.exports = async function(opts)
 {
    try
    {
-      global.$$pluginManager.add({ name: 'plugin-postcss-sass', instance: PluginHandler });
+      global.$$pluginManager.add({ name: '@typhonjs-node-bundle/plugin-postcss-sass', instance: PluginHandler });
 
       // TODO REMOVE
       process.stdout.write(`plugin-postcss-sass init hook running ${opts.id}\n`);

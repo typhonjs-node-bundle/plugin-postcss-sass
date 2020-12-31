@@ -12,20 +12,23 @@ class PluginHandler
    /**
     * Returns the configured input plugin for `@rollup/plugin-replace`
     *
-    * @param {object} config        - The CLI config
-    * @param {object} config.flags  - The CLI config
+    * @param {object} bundleData - The CLI config
+    * @param {object} bundleData.cliFlags  - The CLI flags
     *
     * @returns {object} Rollup plugin
     */
-   static getInputPlugin(config = {})
+   static getInputPlugin(bundleData = {})
    {
-      if (config.flags)
+      if (bundleData.cliFlags)
       {
-         const sourceMap = typeof config.flags.sourcemap === 'boolean' ? config.flags.sourcemap : true;
+         const sourceMap = typeof bundleData.cliFlags.sourcemap === 'boolean' ? bundleData.cliFlags.sourcemap : true;
+
+         const filename = typeof bundleData.currentBundle.cssFilename === 'string' ?
+          bundleData.currentBundle.cssFilename : 'styles.css';
 
          const postcssConfig = {
             inject: false,                               // Don't inject CSS into <HEAD>
-            extract: `styles.css`,                       // Output to `styles.css` in directory of the bundle
+            extract: filename,                           // Output CSS w/ bundle file name to the deploy directory
             extensions: ['.scss', '.sass', '.css'],      // File extensions
             plugins: [autoprefixer, postcssPresetEnv],   // Postcss plugins to use
             sourceMap,                                   // Potentially generate sourcemaps

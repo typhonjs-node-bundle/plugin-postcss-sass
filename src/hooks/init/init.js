@@ -3,7 +3,6 @@ const postcss           = require('rollup-plugin-postcss');
 const autoprefixer      = require('autoprefixer');
 const postcssPresetEnv  = require('postcss-preset-env');
 
-
 /**
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
  * instance of `rollup-plugin-postcss` with autoprefixer, postcss, postcss-preset-env.
@@ -26,23 +25,21 @@ class PluginHandler
 
          const sourceMap = typeof bundleData.cliFlags.sourcemap === 'boolean' ? bundleData.cliFlags.sourcemap : true;
 
-         const filename = typeof bundleData.currentBundle.cssFilename === 'string' ?
-          bundleData.currentBundle.cssFilename : 'styles.css';
+         const filename = typeof bundleData.currentBundle.outputCSSFilename === 'string' ?
+          bundleData.currentBundle.outputCSSFilename : 'styles.css';
 
-         const defaultConfig = {
+         const postcssConfig = {
             extract: filename,                           // Output CSS w/ bundle file name to the deploy directory
             inject: false,                               // Don't inject CSS into <HEAD>
             minimize,                                    // Potentially minimizes
             plugins: [autoprefixer, postcssPresetEnv],   // Postcss plugins to use
             sourceMap,                                   // Potentially generate sourcemaps
+
+            extensions: ['.css', '.less', '.sass', '.scss', '.styl', '.stylus'], // File extensions
+            use: ['sass', 'stylus', 'less'],                                     // Use sass / dart-sass
          };
 
-         const postcssConfig = {
-            extensions: ['.scss', '.sass', '.css'],      // File extensions
-            use: ['sass'],                               // Use sass / dart-sass
-         };
-
-         return postcss(Object.assign(defaultConfig, postcssConfig));
+         return postcss(postcssConfig);
       }
    }
 
@@ -72,7 +69,7 @@ module.exports = async function(opts)
 {
    try
    {
-      global.$$pluginManager.add({ name: '@typhonjs-node-bundle/plugin-postcss-sass', instance: PluginHandler });
+      global.$$pluginManager.add({ name: '@typhonjs-node-rollup/plugin-postcss', instance: PluginHandler });
 
       // TODO REMOVE
       process.stdout.write(`plugin-postcss-sass init hook running ${opts.id}\n`);

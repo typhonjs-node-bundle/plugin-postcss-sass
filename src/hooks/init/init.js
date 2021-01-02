@@ -3,6 +3,7 @@ const postcss           = require('rollup-plugin-postcss');
 const autoprefixer      = require('autoprefixer');
 const postcssPresetEnv  = require('postcss-preset-env');
 
+
 /**
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
  * instance of `rollup-plugin-postcss` with autoprefixer, postcss, postcss-preset-env.
@@ -21,21 +22,27 @@ class PluginHandler
    {
       if (bundleData.cliFlags)
       {
+         const minimize = typeof bundleData.cliFlags.compress === 'boolean' ? bundleData.cliFlags.compress : false;
+
          const sourceMap = typeof bundleData.cliFlags.sourcemap === 'boolean' ? bundleData.cliFlags.sourcemap : true;
 
          const filename = typeof bundleData.currentBundle.cssFilename === 'string' ?
           bundleData.currentBundle.cssFilename : 'styles.css';
 
-         const postcssConfig = {
-            inject: false,                               // Don't inject CSS into <HEAD>
+         const defaultConfig = {
             extract: filename,                           // Output CSS w/ bundle file name to the deploy directory
-            extensions: ['.scss', '.sass', '.css'],      // File extensions
+            inject: false,                               // Don't inject CSS into <HEAD>
+            minimize,                                    // Potentially minimizes
             plugins: [autoprefixer, postcssPresetEnv],   // Postcss plugins to use
             sourceMap,                                   // Potentially generate sourcemaps
+         };
+
+         const postcssConfig = {
+            extensions: ['.scss', '.sass', '.css'],      // File extensions
             use: ['sass'],                               // Use sass / dart-sass
          };
 
-         return postcss(postcssConfig);
+         return postcss(Object.assign(defaultConfig, postcssConfig));
       }
    }
 
@@ -50,7 +57,7 @@ class PluginHandler
     */
    static onPluginLoad(ev)
    {
-      ev.eventbus.on('typhonjs:oclif:rollup:plugins:main:input:get', PluginHandler.getInputPlugin, PluginHandler);
+      ev.eventbus.on('typhonjs:oclif:bundle:plugins:main:input:get', PluginHandler.getInputPlugin, PluginHandler);
    }
 }
 

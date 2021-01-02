@@ -1,9 +1,9 @@
 {
-  "name": "plugin-postcss-sass",
-  "description": "Provides an Oclif plugin to add PostCSS configured for Sass to rollup-runner.",
+  "name": "@typhonjs-node-rollup/plugin-postcss",
+  "description": "Provides an Oclif plugin to add PostCSS configured for Less, Sass & Styles to rollup-runner.",
   "version": "0.0.0",
   "author": "typhonrt",
-  "bugs": "https://github.com/typhonjs-node-bundle/npmbundle/issues",
+  "bugs": "https://github.com/typhonjs-node-rollup/issues/issues",
   "dependencies": {
     "autoprefixer": "^10.0.0",
     "less": "^4.0.0",
@@ -36,7 +36,7 @@
     "/oclif.manifest.json",
     "/src"
   ],
-  "homepage": "https://github.com/typhonjs-node-bundle/plugin-postcss-sass",
+  "homepage": "https://github.com/typhonjs-node-rollup/plugin-postcss",
   "keywords": [
     "oclif-plugin"
   ],
@@ -48,7 +48,7 @@
       ]
     }
   },
-  "repository": "typhonjs-node-bundle/plugin-postcss-sass",
+  "repository": "typhonjs-node-rollup/plugin-postcss",
   "scripts": {
     "eslint": "eslint .",
     "postpack": "rm -f oclif.manifest.json",

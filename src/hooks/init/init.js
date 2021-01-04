@@ -71,8 +71,7 @@ module.exports = async function(opts)
    {
       global.$$pluginManager.add({ name: '@typhonjs-node-rollup/plugin-postcss', instance: PluginHandler });
 
-      // TODO REMOVE
-      process.stdout.write(`plugin-postcss-sass init hook running ${opts.id}\n`);
+      global.$$eventbus.trigger('log:debug', `plugin-postcss init hook running '${opts.id}'.`);
    }
    catch (error)
    {

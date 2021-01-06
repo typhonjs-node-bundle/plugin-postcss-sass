@@ -3,6 +3,13 @@ const postcss           = require('rollup-plugin-postcss');
 const autoprefixer      = require('autoprefixer');
 const postcssPresetEnv  = require('postcss-preset-env');
 
+const s_DEFAULT_CONFIG = {
+   inject: false,                                                       // Don't inject CSS into <HEAD>
+   plugins: [autoprefixer, postcssPresetEnv],                           // Postcss plugins to use
+   extensions: ['.css', '.less', '.sass', '.scss', '.styl', '.stylus'], // File extensions
+   use: ['sass', 'stylus', 'less'],                                     // Use sass / dart-sass
+};
+
 /**
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
  * instance of `rollup-plugin-postcss` with autoprefixer, postcss, postcss-preset-env.
@@ -40,21 +47,65 @@ class PluginLoader
          const sourceMap = typeof bundleData.cliFlags.sourcemap === 'boolean' ? bundleData.cliFlags.sourcemap : true;
 
          const filename = typeof bundleData.currentBundle.outputCSSFilename === 'string' ?
-            bundleData.currentBundle.outputCSSFilename : 'styles.css';
+          bundleData.currentBundle.outputCSSFilename : 'styles.css';
 
-         const postcssConfig = {
-            extract: filename,                           // Output CSS w/ bundle file name to the deploy directory
-            inject: false,                               // Don't inject CSS into <HEAD>
-            minimize,                                    // Potentially minimizes
-            plugins: [autoprefixer, postcssPresetEnv],   // Postcss plugins to use
-            sourceMap,                                   // Potentially generate sourcemaps
+         const postcssConfig = PluginLoader._loadConfig(bundleData.cliFlags);
 
-            extensions: ['.css', '.less', '.sass', '.scss', '.styl', '.stylus'], // File extensions
-            use: ['sass', 'stylus', 'less'],                                     // Use sass / dart-sass
-         };
+         postcssConfig.extract = filename;    // Output CSS w/ bundle file name to the deploy directory
+         postcssConfig.minimize = minimize;   // Potentially minimizes
+         postcssConfig.sourceMap = sourceMap; // Potentially generate sourcemaps
 
          return postcss(postcssConfig);
       }
+   }
+
+   /**
+    * Attempt to load a local configuration file or provide the default configuration.
+    *
+    * @param {object} cliFlags - The CLI flags.
+    *
+    * @returns {object} Either the default Terser configuration file or a locally provided configuration file.
+    * @private
+    */
+   static _loadConfig(cliFlags)
+   {
+      if (typeof cliFlags['ignore-local-config'] === 'boolean' && cliFlags['ignore-local-config'])
+      {
+         return s_DEFAULT_CONFIG;
+      }
+
+      // Attempt to load any local configuration files via FileUtil.
+      const localConfig = global.$$eventbus.triggerSync('typhonjs:oclif:system:file:util:configs:local:open',
+       'postcss.config', ['.js'], `${PluginLoader.pluginName} loading local config failed - `);
+
+      if (localConfig !== null)
+      {
+         if (typeof localConfig.data === 'object')
+         {
+            if (Object.keys(localConfig.data).length === 0)
+            {
+               global.$$eventbus.trigger('log:warn',
+                `${PluginLoader.pluginName}: local PostCSS configuration file empty using default config:\n`
+               + `${localConfig.relativePath}`);
+
+               return s_DEFAULT_CONFIG;
+            }
+
+            global.$$eventbus.trigger('log:verbose',
+             `${PluginLoader.pluginName}: deferring to local PostCSS configuration file.`);
+
+            return localConfig.data;
+         }
+         else
+         {
+            global.$$eventbus.trigger('log:warn', `${PluginLoader.pluginName}: local PostCSS configuration file `
+            + `malformed using default; expected an 'object':\n${localConfig.relativePath}`);
+
+            return s_DEFAULT_CONFIG;
+         }
+      }
+
+      return s_DEFAULT_CONFIG;
    }
 
    /**

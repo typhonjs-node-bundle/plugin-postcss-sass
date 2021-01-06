@@ -64,7 +64,7 @@ class PluginLoader
     *
     * @param {object} cliFlags - The CLI flags.
     *
-    * @returns {object} Either the default Terser configuration file or a locally provided configuration file.
+    * @returns {object} Either the default PostCSS configuration file or a locally provided configuration file.
     * @private
     */
    static _loadConfig(cliFlags)

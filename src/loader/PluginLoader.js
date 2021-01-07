@@ -3,6 +3,9 @@ const postcss           = require('rollup-plugin-postcss');
 const autoprefixer      = require('autoprefixer');
 const postcssPresetEnv  = require('postcss-preset-env');
 
+const s_LOCAL_CONFIG_BASENAME = 'postcss.config';
+const s_LOCAL_CONFIG_EXTENSIONS = ['.js', '.mjs'];
+
 const s_DEFAULT_CONFIG = {
    inject: false,                                                       // Don't inject CSS into <HEAD>
    plugins: [autoprefixer, postcssPresetEnv],                           // Postcss plugins to use
@@ -38,7 +41,7 @@ class PluginLoader
     *
     * @returns {object} Rollup plugin
     */
-   static getInputPlugin(bundleData = {})
+   static async getInputPlugin(bundleData = {})
    {
       if (bundleData.cliFlags)
       {
@@ -49,13 +52,13 @@ class PluginLoader
          const filename = typeof bundleData.currentBundle.outputCSSFilename === 'string' ?
           bundleData.currentBundle.outputCSSFilename : 'styles.css';
 
-         const postcssConfig = PluginLoader._loadConfig(bundleData.cliFlags);
+         const config = await PluginLoader._loadConfig(bundleData.cliFlags);
 
-         postcssConfig.extract = filename;    // Output CSS w/ bundle file name to the deploy directory
-         postcssConfig.minimize = minimize;   // Potentially minimizes
-         postcssConfig.sourceMap = sourceMap; // Potentially generate sourcemaps
+         config.extract = filename;    // Output CSS w/ bundle file name to the deploy directory
+         config.minimize = minimize;   // Potentially minimizes
+         config.sourceMap = sourceMap; // Potentially generate sourcemaps
 
-         return postcss(postcssConfig);
+         return postcss(config);
       }
    }
 
@@ -67,7 +70,7 @@ class PluginLoader
     * @returns {object} Either the default PostCSS configuration file or a locally provided configuration file.
     * @private
     */
-   static _loadConfig(cliFlags)
+   static async _loadConfig(cliFlags)
    {
       if (typeof cliFlags['ignore-local-config'] === 'boolean' && cliFlags['ignore-local-config'])
       {
@@ -75,8 +78,10 @@ class PluginLoader
       }
 
       // Attempt to load any local configuration files via FileUtil.
-      const localConfig = global.$$eventbus.triggerSync('typhonjs:oclif:system:file:util:configs:local:open',
-       'postcss.config', ['.js'], `${PluginLoader.pluginName} loading local config failed - `);
+
+      const localConfig = await global.$$eventbus.triggerSync('typhonjs:oclif:system:file:util:configs:local:open',
+       s_LOCAL_CONFIG_BASENAME, s_LOCAL_CONFIG_EXTENSIONS,
+        `${PluginLoader.pluginName} loading local configuration file failed...`);
 
       if (localConfig !== null)
       {
@@ -85,7 +90,7 @@ class PluginLoader
             if (Object.keys(localConfig.data).length === 0)
             {
                global.$$eventbus.trigger('log:warn',
-                `${PluginLoader.pluginName}: local PostCSS configuration file empty using default config:\n`
+                `${PluginLoader.pluginName}: local PostCSS configuration file empty using default configuration:\n`
                + `${localConfig.relativePath}`);
 
                return s_DEFAULT_CONFIG;

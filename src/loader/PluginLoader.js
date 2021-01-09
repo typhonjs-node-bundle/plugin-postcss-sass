@@ -52,7 +52,12 @@ class PluginLoader
          const filename = typeof bundleData.currentBundle.outputCSSFilename === 'string' ?
           bundleData.currentBundle.outputCSSFilename : 'styles.css';
 
-         const config = await PluginLoader._loadConfig(bundleData.cliFlags);
+         const config = await global.$$eventbus.triggerAsync('typhonjs:oclif:system:file:util:config:open:safe', {
+            cliFlags: bundleData.cliFlags,
+            moduleName: 'postcss',
+            packageName: PluginLoader.packageName,
+            defaultConfig: s_DEFAULT_CONFIG
+         });
 
          config.extract = filename;    // Output CSS w/ bundle file name to the deploy directory
          config.minimize = minimize;   // Potentially minimizes
@@ -60,58 +65,6 @@ class PluginLoader
 
          return postcss(config);
       }
-   }
-
-   /**
-    * Attempt to load a local configuration file or provide the default configuration.
-    *
-    * @param {object} cliFlags - The CLI flags.
-    *
-    * @returns {object} Either the default PostCSS configuration file or a locally provided configuration file.
-    * @private
-    */
-   static async _loadConfig(cliFlags)
-   {
-      if (typeof cliFlags['ignore-local-config'] === 'boolean' && cliFlags['ignore-local-config'])
-      {
-         return s_DEFAULT_CONFIG;
-      }
-
-      // Attempt to load any local configuration files via FileUtil.
-
-      const result = await global.$$eventbus.triggerAsync('typhonjs:oclif:system:file:util:config:open', {
-         moduleName: 'postcss',
-         errorMessage: `${PluginLoader.packageName} loading local configuration file failed...`
-      });
-
-      if (result !== null)
-      {
-         if (typeof result.config === 'object')
-         {
-            if (Object.keys(result.config).length === 0)
-            {
-               global.$$eventbus.trigger('log:warn',
-                `${PluginLoader.packageName}: local PostCSS configuration file empty using default configuration:\n`
-               + `${result.relativePath}`);
-
-               return s_DEFAULT_CONFIG;
-            }
-
-            global.$$eventbus.trigger('log:verbose',
-             `${PluginLoader.packageName}: deferring to local PostCSS configuration file.`);
-
-            return result.config;
-         }
-         else
-         {
-            global.$$eventbus.trigger('log:warn', `${PluginLoader.packageName}: local PostCSS configuration file `
-            + `malformed using default; expected an 'object':\n${result.relativePath}`);
-
-            return s_DEFAULT_CONFIG;
-         }
-      }
-
-      return s_DEFAULT_CONFIG;
    }
 
    /**

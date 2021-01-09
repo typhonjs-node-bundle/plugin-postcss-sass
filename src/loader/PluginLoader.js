@@ -3,6 +3,9 @@ const postcss           = require('rollup-plugin-postcss');
 const autoprefixer      = require('autoprefixer');
 const postcssPresetEnv  = require('postcss-preset-env');
 
+const s_CONFLICT_PACKAGES = ['rollup-plugin-postcss'];
+const s_PACKAGE_NAME = '@typhonjs-node-rollup/plugin-postcss';
+
 const s_DEFAULT_CONFIG = {
    inject: false,                                                       // Don't inject CSS into <HEAD>
    plugins: [autoprefixer, postcssPresetEnv],                           // Postcss plugins to use
@@ -17,18 +20,18 @@ const s_DEFAULT_CONFIG = {
 class PluginLoader
 {
    /**
+    * Returns the any modules that cause a conflict.
+    *
+    * @returns {string[]}
+    */
+   static get conflictPackages() { return s_CONFLICT_PACKAGES; }
+
+   /**
     * Returns the `package.json` module name.
     *
     * @returns {string}
     */
-   static get pluginName() { return '@typhonjs-node-rollup/plugin-postcss'; }
-
-   /**
-    * Returns the rollup plugins managed.
-    *
-    * @returns {string[]}
-    */
-   static get rollupPlugins() { return ['rollup-plugin-postcss']; }
+   static get packageName() { return s_PACKAGE_NAME; }
 
    /**
     * Returns the configured input plugin for `@rollup/plugin-replace`
@@ -78,7 +81,7 @@ class PluginLoader
 
       const result = await global.$$eventbus.triggerAsync('typhonjs:oclif:system:file:util:config:open', {
          moduleName: 'postcss',
-         errorMessage: `${PluginLoader.pluginName} loading local configuration file failed...`
+         errorMessage: `${PluginLoader.packageName} loading local configuration file failed...`
       });
 
       if (result !== null)
@@ -88,20 +91,20 @@ class PluginLoader
             if (Object.keys(result.config).length === 0)
             {
                global.$$eventbus.trigger('log:warn',
-                `${PluginLoader.pluginName}: local PostCSS configuration file empty using default configuration:\n`
+                `${PluginLoader.packageName}: local PostCSS configuration file empty using default configuration:\n`
                + `${result.relativePath}`);
 
                return s_DEFAULT_CONFIG;
             }
 
             global.$$eventbus.trigger('log:verbose',
-             `${PluginLoader.pluginName}: deferring to local PostCSS configuration file.`);
+             `${PluginLoader.packageName}: deferring to local PostCSS configuration file.`);
 
             return result.config;
          }
          else
          {
-            global.$$eventbus.trigger('log:warn', `${PluginLoader.pluginName}: local PostCSS configuration file `
+            global.$$eventbus.trigger('log:warn', `${PluginLoader.packageName}: local PostCSS configuration file `
             + `malformed using default; expected an 'object':\n${result.relativePath}`);
 
             return s_DEFAULT_CONFIG;

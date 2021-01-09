@@ -3,9 +3,6 @@ const postcss           = require('rollup-plugin-postcss');
 const autoprefixer      = require('autoprefixer');
 const postcssPresetEnv  = require('postcss-preset-env');
 
-const s_LOCAL_CONFIG_BASENAME = 'postcss.config';
-const s_LOCAL_CONFIG_EXTENSIONS = ['.js', '.mjs'];
-
 const s_DEFAULT_CONFIG = {
    inject: false,                                                       // Don't inject CSS into <HEAD>
    plugins: [autoprefixer, postcssPresetEnv],                           // Postcss plugins to use
@@ -79,19 +76,20 @@ class PluginLoader
 
       // Attempt to load any local configuration files via FileUtil.
 
-      const localConfig = await global.$$eventbus.triggerSync('typhonjs:oclif:system:file:util:configs:local:open',
-       s_LOCAL_CONFIG_BASENAME, s_LOCAL_CONFIG_EXTENSIONS,
-        `${PluginLoader.pluginName} loading local configuration file failed...`);
+      const result = await global.$$eventbus.triggerAsync('typhonjs:oclif:system:file:util:config:open', {
+         moduleName: 'postcss',
+         errorMessage: `${PluginLoader.pluginName} loading local configuration file failed...`
+      });
 
-      if (localConfig !== null)
+      if (result !== null)
       {
-         if (typeof localConfig.data === 'object')
+         if (typeof result.config === 'object')
          {
-            if (Object.keys(localConfig.data).length === 0)
+            if (Object.keys(result.config).length === 0)
             {
                global.$$eventbus.trigger('log:warn',
                 `${PluginLoader.pluginName}: local PostCSS configuration file empty using default configuration:\n`
-               + `${localConfig.relativePath}`);
+               + `${result.relativePath}`);
 
                return s_DEFAULT_CONFIG;
             }
@@ -99,12 +97,12 @@ class PluginLoader
             global.$$eventbus.trigger('log:verbose',
              `${PluginLoader.pluginName}: deferring to local PostCSS configuration file.`);
 
-            return localConfig.data;
+            return result.config;
          }
          else
          {
             global.$$eventbus.trigger('log:warn', `${PluginLoader.pluginName}: local PostCSS configuration file `
-            + `malformed using default; expected an 'object':\n${localConfig.relativePath}`);
+            + `malformed using default; expected an 'object':\n${result.relativePath}`);
 
             return s_DEFAULT_CONFIG;
          }

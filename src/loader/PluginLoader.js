@@ -1,7 +1,7 @@
-const postcss           = require('rollup-plugin-postcss');
+import postcss          from 'rollup-plugin-postcss';
 
-const autoprefixer      = require('autoprefixer');
-const postcssPresetEnv  = require('postcss-preset-env');
+import autoprefixer     from 'autoprefixer';
+import postcssPresetEnv from 'postcss-preset-env';
 
 const s_CONFLICT_PACKAGES = ['rollup-plugin-postcss'];
 const s_PACKAGE_NAME = '@typhonjs-node-rollup/plugin-postcss';
@@ -17,7 +17,7 @@ const s_DEFAULT_CONFIG = {
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
  * instance of `rollup-plugin-postcss` with autoprefixer, postcss, postcss-preset-env.
  */
-class PluginLoader
+export default class PluginLoader
 {
    /**
     * Returns the any modules that cause a conflict.
@@ -81,5 +81,3 @@ class PluginLoader
       ev.eventbus.on('typhonjs:oclif:bundle:plugins:main:input:get', PluginLoader.getInputPlugin, PluginLoader);
    }
 }
-
-module.exports = PluginLoader;

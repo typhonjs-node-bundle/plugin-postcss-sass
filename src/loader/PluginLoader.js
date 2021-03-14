@@ -52,7 +52,7 @@ export default class PluginLoader
          const filename = typeof bundleData.currentBundle.outputCSSFilename === 'string' ?
           bundleData.currentBundle.outputCSSFilename : 'styles.css';
 
-         const config = await global.$$eventbus.triggerAsync('typhonjs:oclif:system:file:util:config:open:safe', {
+         const config = await globalThis.$$eventbus.triggerAsync('typhonjs:oclif:system:file:util:config:open:safe', {
             cliFlags: bundleData.cliFlags,
             moduleName: 'postcss',
             packageName: PluginLoader.packageName,

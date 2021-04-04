@@ -6,11 +6,14 @@ import postcssPresetEnv from 'postcss-preset-env';
 const s_CONFLICT_PACKAGES = ['rollup-plugin-postcss'];
 const s_PACKAGE_NAME = '@typhonjs-node-rollup/plugin-postcss';
 
-const s_DEFAULT_CONFIG = {
-   inject: false,                                                       // Don't inject CSS into <HEAD>
-   plugins: [autoprefixer, postcssPresetEnv],                           // Postcss plugins to use
-   extensions: ['.css', '.less', '.sass', '.scss', '.styl', '.stylus'], // File extensions
-   use: ['sass', 'stylus', 'less'],                                     // Use sass / dart-sass
+const s_DEFAULT_CONFIG = () =>
+{
+   return {
+      inject: false,                                                       // Don't inject CSS into <HEAD>
+      plugins: [autoprefixer, postcssPresetEnv],                           // Postcss plugins to use
+      extensions: ['.css', '.less', '.sass', '.scss', '.styl', '.stylus'], // File extensions
+      use: ['sass', 'stylus', 'less'],                                     // Use sass / dart-sass
+   };
 };
 
 /**
@@ -56,7 +59,7 @@ export default class PluginLoader
             cliFlags: bundleData.cliFlags,
             moduleName: 'postcss',
             packageName: PluginLoader.packageName,
-            defaultConfig: s_DEFAULT_CONFIG
+            defaultConfig: s_DEFAULT_CONFIG()
          });
 
          config.extract = filename;    // Output CSS w/ bundle file name to the deploy directory

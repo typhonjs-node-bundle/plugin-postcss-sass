@@ -55,12 +55,24 @@ export default class PluginLoader
          const filename = typeof bundleData.currentBundle.outputCSSFilename === 'string' ?
           bundleData.currentBundle.outputCSSFilename : 'styles.css';
 
-         const config = await globalThis.$$eventbus.triggerAsync('typhonjs:oclif:system:file:util:config:open:safe', {
-            cliFlags: bundleData.cliFlags,
-            moduleName: 'postcss',
-            packageName: PluginLoader.packageName,
-            defaultConfig: s_DEFAULT_CONFIG()
-         });
+         let config;
+
+         // Handle ignoring loading local config files if the CLI flag `--ignore-local-config` is true.
+         if (typeof bundleData.cliFlags['ignore-local-config'] === 'boolean' &&
+           bundleData.cliFlags['ignore-local-config'])
+         {
+            config = s_DEFAULT_CONFIG();
+         }
+         else
+         {
+            config = await globalThis.$$eventbus.triggerAsync('typhonjs:util:cosmiconfig:config:load:safe', {
+               moduleName: 'postcss',
+               packageName: PluginLoader.packageName,
+               defaultConfig: s_DEFAULT_CONFIG(),
+               startDir: globalThis.$$cli_baseCWD,
+               stopDir: globalThis.$$cli_origCWD
+            });
+         }
 
          config.extract = filename;    // Output CSS w/ bundle file name to the deploy directory
          config.minimize = minimize;   // Potentially minimizes

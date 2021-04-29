@@ -1,16 +1,12 @@
 {
-  "name": "@typhonjs-node-rollup/plugin-postcss",
+  "name": "@typhonjs-oclif-rollup/plugin-postcss",
   "description": "Provides an Oclif plugin to add PostCSS configured for Less, Sass & Styles to rollup-runner.",
   "version": "0.0.2",
-  "author": "typhonrt",
-  "bugs": "https://github.com/typhonjs-node-rollup/issues/issues",
+  "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
+  "bugs": "https://github.com/typhonjs-oclif-rollup/issues/issues",
   "type": "module",
-  "maintainers": [
-    {
-      "name": "Michael Leahy",
-      "email": "support@typhonjs.io",
-      "url": "https://github.com/typhonrt"
-    }
+  "contributors": [
+    "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
   "dependencies": {
     "autoprefixer": "^10.0.0",
@@ -22,7 +18,7 @@
     "stylus": "^0.54.0"
   },
   "devDependencies": {
-    "@typhonjs-node-utils/build-test": "^0.1.0"
+    "@typhonjs-utils/build-test": "^0.1.0"
   },
   "peerDependencies": {
     "rollup": "^2.x"
@@ -35,9 +31,10 @@
     "/npm-shrinkwrap.json",
     "/src"
   ],
-  "homepage": "https://github.com/typhonjs-node-rollup/plugin-postcss",
+  "homepage": "https://github.com/typhonjs-oclif-rollup/plugin-postcss",
   "keywords": [
     "typhonjs",
+    "oclif",
     "rollup",
     "postcss",
     "oclif-plugin"
@@ -50,7 +47,7 @@
       ]
     }
   },
-  "repository": "typhonjs-node-rollup/plugin-postcss",
+  "repository": "github:typhonjs-oclif-rollup/plugin-postcss",
   "scripts": {
     "eslint": "eslint .",
     "prepack": "npm run eslint"

@@ -4,7 +4,7 @@ import autoprefixer     from 'autoprefixer';
 import postcssPresetEnv from 'postcss-preset-env';
 
 const s_CONFLICT_PACKAGES = ['rollup-plugin-postcss'];
-const s_PACKAGE_NAME = '@typhonjs-node-rollup/plugin-postcss';
+const s_PACKAGE_NAME = '@typhonjs-oclif-rollup/plugin-postcss';
 
 const s_DEFAULT_CONFIG = () =>
 {
@@ -37,7 +37,7 @@ export default class PluginLoader
    static get packageName() { return s_PACKAGE_NAME; }
 
    /**
-    * Returns the configured input plugin for `@rollup/plugin-replace`
+    * Returns the configured input plugin for `rollup-plugin-postcss`.
     *
     * @param {object} bundleData - The CLI config
     * @param {object} bundleData.cliFlags  - The CLI flags

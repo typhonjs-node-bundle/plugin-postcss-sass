@@ -1,7 +1,7 @@
 {
   "name": "@typhonjs-oclif-rollup/plugin-postcss",
   "description": "Provides an Oclif plugin to add PostCSS configured for Sass, Stylus, and Less to rollup-runner.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
   "type": "module",
   "main": "src/loader/PluginLoader.js",
@@ -30,7 +30,7 @@
     "/npm-shrinkwrap.json",
     "/src"
   ],
-  "homepage": "https://github.com/typhonjs-oclif-rollup/plugin-postcss",
+  "homepage": "https://github.com/typhonjs-oclif-rollup/plugin-postcss#readme",
   "keywords": [
     "typhonjs",
     "oclif",
